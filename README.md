@@ -1,6 +1,3 @@
-<img width="717" height="1600" alt="face verification" src="https://github.com/user-attachments/assets/215ce6fe-8417-4f0b-bb13-05c1e0b85441" />
-<img width="717" height="1600" alt="face registration" src="https://github.com/user-attachments/assets/df17897c-470d-4881-8c91-3d042ae44a3e" />
-<img width="717" height="1600" alt="dashBaord" src="https://github.com/user-attachments/assets/71225180-4e97-42a6-a55f-0283565c5108" />
 # Facial Verify Compose
 
 A modern Android application built with Jetpack Compose that implements robust face registration and verification using on-device Machine Learning.
