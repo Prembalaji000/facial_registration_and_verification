@@ -25,9 +25,9 @@ A modern Android application built with Jetpack Compose that implements robust f
 
 ## 📸 Screenshots
 
-| Registration | Verification | Success |
+| Dashboard | Registration | Verification |
 | :---: | :---: | :---: |
-| Guided Poses | Match Score | Result View |
+| <img src="https://github.com/user-attachments/assets/71225180-4e97-42a6-a55f-0283565c5108" width="250" /> | <img src="https://github.com/user-attachments/assets/df17897c-470d-4881-8c91-3d042ae44a3e" width="250" /> | <img src="https://github.com/user-attachments/assets/215ce6fe-8417-4f0b-bb13-05c1e0b85441" width="250" /> |
 
 ## 🏗️ Project Structure
 
