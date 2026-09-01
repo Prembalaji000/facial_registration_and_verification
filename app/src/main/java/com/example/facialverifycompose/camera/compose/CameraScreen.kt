@@ -4,6 +4,13 @@ import android.Manifest
 import android.graphics.Bitmap
 import android.util.Log
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -109,11 +116,17 @@ fun CameraScreen(
     
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isGranted ->
+            isCameraGranted = isGranted
             if (isGranted) {
-                isCameraGranted = true
                 isStorageGranted = true
             }
         }
+
+    LaunchedEffect(Unit) {
+        if (!isCameraGranted) {
+            launcher.launch(Manifest.permission.CAMERA)
+        }
+    }
 
     LaunchedEffect(isCameraGranted) {
         if (isCameraGranted) {
@@ -233,23 +246,35 @@ fun CameraScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(Color.Black),
             contentAlignment = Alignment.Center,
         ){
-            Button(
-                onClick = {
-                    if (!isCameraGranted) {
-                        launcher.launch(Manifest.permission.CAMERA)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Black
-                )
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "OPEN CAMERA",
-                    color = Color.White
+                    text = "Camera Permission Required",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Please grant camera access to continue",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = {
+                        launcher.launch(Manifest.permission.CAMERA)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(text = "GRANT PERMISSION")
+                }
             }
         }
     }
