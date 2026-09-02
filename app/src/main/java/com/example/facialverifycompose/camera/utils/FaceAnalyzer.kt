@@ -19,6 +19,7 @@ import kotlin.math.hypot
 class FaceAnalyzer(
     private val onFaceDetected: (faces: List<Face>, width: Int, height: Int) -> Unit,
     private val faceNetProcessor: FaceNetProcessor,
+    private val livenessChecker: LivenessChecker,
     private val onStatusChanged: (FaceMonitorStatus) -> Unit,
     private val onDescriptorGenerated: (FloatArray) -> Unit,
     private val addCapturedFace: (Bitmap?) -> Unit,
@@ -64,6 +65,7 @@ class FaceAnalyzer(
         val height = if (imageProxy.imageInfo.rotationDegrees % 180 == 0) imageProxy.height else imageProxy.width
 
         if (faces.isEmpty()) {
+            livenessChecker.reset()
             onStatusChanged(FaceMonitorStatus.OUTSIDE_FRAME)
             imageProxy.close()
             return
@@ -110,10 +112,21 @@ class FaceAnalyzer(
             return
         }
 
+        // Liveness Detection (Anti-Spoofing) - Only during Verification
+        val bitmap = imageProxy.toBitmap()
+        if (!isRegisterMode()) {
+            if (!livenessChecker.isRealFace(bitmap, face, imageProxy.imageInfo.rotationDegrees)) {
+                val rotatedFullFrame = rotateBitmap(bitmap, imageProxy.imageInfo.rotationDegrees)
+                addCapturedFace(rotatedFullFrame) 
+                onStatusChanged(FaceMonitorStatus.STATIC_IMAGE_DETECTED)
+                imageProxy.close()
+                return
+            }
+        }
+
         onStatusChanged(FaceMonitorStatus.INSIDE_FRAME)
 
         // Descriptor Generation
-        val bitmap = imageProxy.toBitmap()
         val croppedFace = cropFace(bitmap, face.boundingBox, imageProxy.imageInfo.rotationDegrees)
         addCapturedFace(croppedFace)
         
@@ -175,6 +188,12 @@ class FaceAnalyzer(
         }
         
         return false
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
+        if (degrees == 0) return bitmap
+        val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
     private fun cropFace(bitmap: Bitmap, boundingBox: Rect, rotationDegrees: Int): Bitmap? {

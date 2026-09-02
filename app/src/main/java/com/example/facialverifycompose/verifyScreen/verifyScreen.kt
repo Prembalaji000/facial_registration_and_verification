@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -47,8 +48,14 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun VerifyScreen(
     verifiedBitmap: Bitmap?,
+    isSpoofDetected: Boolean = false,
     onDoneClick: () -> Unit
 ) {
+    val statusColor = if (isSpoofDetected) Color(0xFFF44336) else Color(0xFF4CAF50)
+    val statusIcon = if (isSpoofDetected) Icons.Default.Error else Icons.Default.CheckCircle
+    val statusTitle = if (isSpoofDetected) "Verification Failed" else "Verification Successful"
+    val statusDesc = if (isSpoofDetected) "Spoofing detected. Please use a real face." else "Your identity has been successfully verified."
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
 
@@ -110,7 +117,7 @@ fun VerifyScreen(
                 modifier = Modifier
                     .size(86.dp)
                     .background(
-                        color = Color(0xFF4CAF50).copy(alpha = 0.12f),
+                        color = statusColor.copy(alpha = 0.12f),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -119,15 +126,15 @@ fun VerifyScreen(
                     modifier = Modifier
                         .size(64.dp)
                         .background(
-                            color = Color(0xFF4CAF50).copy(alpha = 0.18f),
+                            color = statusColor.copy(alpha = 0.18f),
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        imageVector = statusIcon,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = statusColor,
                         modifier = Modifier.size(48.dp)
                     )
                 }
@@ -136,7 +143,7 @@ fun VerifyScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Verification Successful",
+                text = statusTitle,
                 fontSize = 25.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -146,7 +153,7 @@ fun VerifyScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Your identity has been successfully verified.",
+                text = statusDesc,
                 fontSize = 14.sp,
                 color = Color.White.copy(alpha = 0.65f),
                 textAlign = TextAlign.Center

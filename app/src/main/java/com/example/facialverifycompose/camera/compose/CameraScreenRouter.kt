@@ -96,6 +96,7 @@ fun CameraScreenRouter(
         CameraViewState.SUCCESS_VIEW -> {
             VerifyScreen(
                 verifiedBitmap = uiState.verifiedBitmap,
+                isSpoofDetected = uiState.isSpoofDetected,
                 onDoneClick = {
                     viewModel.switchViewState(CameraViewState.PRIMARY_VIEW)
                 }

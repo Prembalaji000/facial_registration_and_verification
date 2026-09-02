@@ -46,8 +46,7 @@ import com.example.facialverifycompose.FacePosition
 import com.example.facialverifycompose.camera.utils.FaceAnalyzer
 import com.example.facialverifycompose.camera.utils.FaceMonitorStatus
 import com.example.facialverifycompose.camera.utils.FaceNetProcessor
-import com.example.facialverifycompose.ml.FaceDetectionAnalyzer
-import com.google.android.datatransport.runtime.ExecutionModule_ExecutorFactory.executor
+import com.example.facialverifycompose.camera.utils.LivenessChecker
 import java.util.concurrent.Executors
 
 @Composable
@@ -80,12 +79,14 @@ fun CameraScreen(
     }
     
     val faceNetProcessor = remember { FaceNetProcessor(context) }
+    val livenessChecker = remember { LivenessChecker(context) }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
     
     DisposableEffect(Unit) {
         onDispose {
             cameraExecutor.shutdown()
             faceNetProcessor.close()
+            livenessChecker.close()
         }
     }
     Log.e("edit 1", "${capturedFace?.facePosition}")
@@ -143,6 +144,7 @@ fun CameraScreen(
                     .also {
                         it.setAnalyzer(cameraExecutor, FaceAnalyzer(
                             faceNetProcessor = faceNetProcessor,
+                            livenessChecker = livenessChecker,
                             onStatusChanged = { status ->
                                 onStatusChanged(status)
                             },

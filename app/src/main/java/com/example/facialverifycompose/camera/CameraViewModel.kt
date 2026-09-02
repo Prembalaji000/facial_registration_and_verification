@@ -83,7 +83,7 @@ class CameraViewModel @Inject constructor(): ViewModel() {
         viewModelState.update { currentState ->
             // In Verify mode, if we are already matched, don't let INSIDE_FRAME flicker it back to blue
             if (currentState.cameraStateView == CameraViewState.VERIFY_VIEW && 
-                currentState.status == FaceMonitorStatus.SAME_PERSON && 
+                (currentState.status == FaceMonitorStatus.SAME_PERSON || currentState.status == FaceMonitorStatus.STATIC_IMAGE_DETECTED) && 
                 newStatus == FaceMonitorStatus.INSIDE_FRAME) {
                 currentState
             } else {
@@ -93,9 +93,21 @@ class CameraViewModel @Inject constructor(): ViewModel() {
         
         if (newStatus != FaceMonitorStatus.INSIDE_FRAME && 
             newStatus != FaceMonitorStatus.SAME_PERSON && 
-            newStatus != FaceMonitorStatus.OTHER_PERSON) {
+            newStatus != FaceMonitorStatus.OTHER_PERSON &&
+            newStatus != FaceMonitorStatus.STATIC_IMAGE_DETECTED) {
             frameBuffer.clear()
             viewModelState.update { it.copy(matchScore = 0f) }
+        }
+
+        // If spoof detected in Verify mode, navigate to success screen with failure status
+        if (state.cameraStateView == CameraViewState.VERIFY_VIEW && newStatus == FaceMonitorStatus.STATIC_IMAGE_DETECTED) {
+            viewModelState.update { 
+                it.copy(
+                    cameraStateView = CameraViewState.SUCCESS_VIEW,
+                    verifiedBitmap = _faceBitmap.value,
+                    isSpoofDetected = true
+                )
+            }
         }
     }
 
@@ -187,7 +199,8 @@ class CameraViewModel @Inject constructor(): ViewModel() {
             it.copy(
                 cameraStateView = cameraStateView,
                 status = FaceMonitorStatus.OUTSIDE_FRAME,
-                matchScore = 0f
+                matchScore = 0f,
+                isSpoofDetected = false
             ) 
         }
     }
@@ -203,7 +216,8 @@ data class MyViewModelState(
     val capturedFace : CapturedData? = null,
     val capturedFaces : List<CapturedData?> = listOf(),
     val cameraStateView: CameraViewState? = CameraViewState.PRIMARY_VIEW,
-    val verifiedBitmap: Bitmap? = null
+    val verifiedBitmap: Bitmap? = null,
+    val isSpoofDetected: Boolean = false
 ){
     fun uiState() = MyUiState(
         isLoading = isLoading,
@@ -214,7 +228,8 @@ data class MyViewModelState(
         capturedFace = capturedFace,
         capturedFaces = capturedFaces,
         cameraStateView = cameraStateView,
-        verifiedBitmap = verifiedBitmap
+        verifiedBitmap = verifiedBitmap,
+        isSpoofDetected = isSpoofDetected
     )
 }
 
@@ -227,7 +242,8 @@ data class MyUiState(
     val capturedFace : CapturedData?,
     val capturedFaces : List<CapturedData?>,
     val cameraStateView: CameraViewState?,
-    val verifiedBitmap: Bitmap?
+    val verifiedBitmap: Bitmap?,
+    val isSpoofDetected: Boolean
 )
 
 enum class CameraViewState(val value: String){

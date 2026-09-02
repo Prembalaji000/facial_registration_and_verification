@@ -6,10 +6,12 @@ A modern Android application built with Jetpack Compose that implements robust f
 
 - **Multi-Pose Face Registration**: Guided 4-step registration process (Straight, Left, Right, and Top) to capture a comprehensive facial profile.
 - **On-Device Face Embeddings**: Uses the **MobileFaceNet** ONNX model via ONNX Runtime to generate 512-dimensional face descriptors for high-accuracy matching.
+- **Advanced Liveness Detection (Anti-Spoofing)**: Integrated with **MiniFASNetV2** ONNX model to detect and block spoofing attempts (e.g., photos, videos, or mobile screens). 
 - **Real-Time Face Detection**: Integrated with **ML Kit Face Detection** for high-performance tracking and pose estimation (Yaw, Pitch).
 - **Intelligent Auto-Capture**: Automatically triggers image capture and descriptor generation once the user reaches and holds the required head angle for 1 second.
 - **Precise Region of Interest (ROI)**: Stricter alignment logic ensuring the face is centered and correctly sized within the UI oval before processing.
 - **Live Verification**: Seamless comparison of live camera frames against all registered descriptors using Cosine Similarity.
+- **Robust Error Handling**: Automatically captures and displays spoofed frames in a dedicated failure view to provide clear feedback to the user.
 - **Modern Architecture**: Built using **MVVM**, **Dagger Hilt**, and **Kotlin Coroutines/Flow** for state management.
 - **Optimized Performance**: Small app footprint achieved through ABI filtering and R8 code/resource shrinking.
 
@@ -19,7 +21,9 @@ A modern Android application built with Jetpack Compose that implements robust f
 - **Camera**: CameraX (Preview & ImageAnalysis)
 - **Face Detection**: Google ML Kit
 - **Inference Engine**: ONNX Runtime (Android)
-- **ML Model**: `w600k_mbf.onnx` (MobileFaceNet)
+- **ML Models**: 
+    - `w600k_mbf.onnx` (MobileFaceNet for Embeddings)
+    - `MiniFASNetV2.onnx` (Liveness Detection)
 - **Dependency Injection**: Dagger Hilt
 - **Asynchronous Logic**: Kotlin Coroutines & StateFlow
 
@@ -31,9 +35,9 @@ A modern Android application built with Jetpack Compose that implements robust f
 
 ## 🏗️ Project Structure
 
-- `camera/utils/`: Core logic for ONNX processing (`FaceNetProcessor`), ML Kit analysis (`FaceAnalyzer`), and mathematical operations (`VectorMath`).
+- `camera/utils/`: Core logic for ONNX processing (`FaceNetProcessor`), Liveness checking (`LivenessChecker`), ML Kit analysis (`FaceAnalyzer`), and mathematical operations (`VectorMath`).
 - `camera/compose/`: Reusable UI components and the main camera screen logic.
-- `verifyScreen/`: Dedicated view for displaying successful verification results.
+- `verifyScreen/`: Dedicated view for displaying successful verification or spoof detection results.
 - `chooseView/`: Navigation entry point for selecting Registration or Verification modes.
 
 ## ⚙️ Getting Started
@@ -41,7 +45,7 @@ A modern Android application built with Jetpack Compose that implements robust f
 1. Clone the repository.
 2. Ensure you have the latest Android Studio installed.
 3. Sync the project with Gradle.
-4. Run the app on a physical device (recommended for camera performance).
+4. Run the app on a physical device (recommended for camera performance and liveness testing).
 
 > [!NOTE]
 > For optimal results, ensure the environment is well-lit and position your face within the dashed oval during registration and verification.
@@ -53,4 +57,4 @@ The app is optimized for release:
 - **ABI Filters**: Limited to `armeabi-v7a` and `arm64-v8a` to reduce APK size by removing emulator-specific native libraries.
 
 ---
-Developed as a demonstration of high-performance, on-device biometric verification.
+Developed as a demonstration of high-performance, on-device biometric verification and anti-spoofing security.
